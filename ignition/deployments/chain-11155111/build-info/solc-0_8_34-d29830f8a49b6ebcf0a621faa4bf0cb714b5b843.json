@@ -1,0 +1,49 @@
+{
+  "_format": "hh3-sol-build-info-1",
+  "id": "solc-0_8_34-d29830f8a49b6ebcf0a621faa4bf0cb714b5b843",
+  "solcVersion": "0.8.34",
+  "solcLongVersion": "0.8.34+commit.80d5c536",
+  "compilerType": "solc",
+  "toolVersions": {
+    "hardhat": "3.15.0"
+  },
+  "userSourceNameMap": {
+    "contracts/CertificateVerification.sol": "project/contracts/CertificateVerification.sol"
+  },
+  "input": {
+    "language": "Solidity",
+    "settings": {
+      "evmVersion": "osaka",
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "outputSelection": {
+        "*": {
+          "": [
+            "ast"
+          ],
+          "*": [
+            "abi",
+            "evm.bytecode.linkReferences",
+            "evm.bytecode.object",
+            "evm.bytecode.opcodes",
+            "evm.bytecode.sourceMap",
+            "evm.deployedBytecode.immutableReferences",
+            "evm.deployedBytecode.linkReferences",
+            "evm.deployedBytecode.object",
+            "evm.deployedBytecode.opcodes",
+            "evm.deployedBytecode.sourceMap",
+            "evm.methodIdentifiers"
+          ]
+        }
+      },
+      "remappings": []
+    },
+    "sources": {
+      "project/contracts/CertificateVerification.sol": {
+        "content": "// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.24;\r\n\r\ncontract CertificateVerification {\r\n\r\n    struct Certificate {\r\n        string certificateId;\r\n        bytes32 certificateHash;\r\n        address issuer;\r\n        uint256 issueDate;\r\n        bool isValid;\r\n    }\r\n\r\n    address public institution;\r\n\r\n    mapping(string => Certificate) public certificates;\r\n\r\n    event CertificateIssued(\r\n        string certificateId,\r\n        bytes32 certificateHash,\r\n        address issuer,\r\n        uint256 issueDate\r\n    );\r\n\r\n    constructor() {\r\n        institution = msg.sender;\r\n    }\r\n\r\n    function issueCertificate(\r\n        string memory _certificateId,\r\n        bytes32 _certificateHash\r\n    ) public {\r\n        require(msg.sender == institution, \"Not authorized to issue certificates\");\r\n        require(\r\n            certificates[_certificateId].issueDate == 0,\r\n            \"Certificate already exists\"\r\n        );\r\n\r\n        certificates[_certificateId] = Certificate(\r\n            _certificateId,\r\n            _certificateHash,\r\n            msg.sender,\r\n            block.timestamp,\r\n            true\r\n        );\r\n\r\n        emit CertificateIssued(_certificateId, _certificateHash, msg.sender, block.timestamp);\r\n    }\r\n\r\n    function verifyCertificate(\r\n        string memory _certificateId,\r\n        bytes32 _certificateHash\r\n    ) public view returns (bool) {\r\n\r\n        Certificate memory certificate = certificates[_certificateId];\r\n\r\n        return (\r\n            certificate.issueDate != 0 &&\r\n            certificate.certificateHash == _certificateHash &&\r\n            certificate.isValid\r\n        );\r\n    }\r\n}"
+      }
+    }
+  }
+}
